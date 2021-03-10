@@ -782,7 +782,7 @@ void render_dungeon(dungeon_t *d)
 {
   pair_t p;
 
-  mvprintw("\n");
+  //mvprintw("\n");
   for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
     for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
       if (charpair(p)) {
@@ -817,8 +817,8 @@ void render_dungeon(dungeon_t *d)
     }
       mvaddch('\n');
   }
-  mvaddch('\n');
-  mvaddch('\n');
+  //mvaddch('\n');
+  //mvaddch('\n');
 }
 
 void delete_dungeon(dungeon_t *d)
@@ -1281,125 +1281,125 @@ int read_pgm(dungeon_t *d, char *pgm)
   return 0;
 }
 
-void render_hardness_map(dungeon_t *d)
-{
-  /* The hardness map includes coordinates, since it's larger *
-   * size makes it more difficult to index a position by eye. */
-  
-  pair_t p;
-  int i;
-  
-  mvaddch('\n');
-  mvprintw("   ");
-  for (i = 0; i < DUNGEON_X; i++) {
-      mvprintw("%2d", i);
-  }
-  mvaddch('\n');
-  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
-      mvprintw("%2d ", p[dim_y]);
-    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
-        mvprintw("%02x", hardnesspair(p));
-    }
-    mvaddch('\n');
-  }
-}
+//void render_hardness_map(dungeon_t *d)
+//{
+//  /* The hardness map includes coordinates, since it's larger *
+//   * size makes it more difficult to index a position by eye. */
+//
+//  pair_t p;
+//  int i;
+//
+//  mvaddch('\n');
+//  mvprintw("   ");
+//  for (i = 0; i < DUNGEON_X; i++) {
+//      mvprintw("%2d", i);
+//  }
+//  mvaddch('\n');
+//  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
+//      mvprintw("%2d ", p[dim_y]);
+//    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
+//        mvprintw("%02x", hardnesspair(p));
+//    }
+//    mvaddch('\n');
+//  }
+//}
 
-void render_movement_cost_map(dungeon_t *d)
-{
-  pair_t p;
+//void render_movement_cost_map(dungeon_t *d)
+//{
+//  pair_t p;
+//
+//  mvaddch('\n');
+//  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
+//    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
+//      if (p[dim_x] ==  d->pc.position[dim_x] &&
+//          p[dim_y] ==  d->pc.position[dim_y]) {
+//        mvaddch('@');
+//      } else {
+//        if (hardnesspair(p) == 255) {
+//            mvprintw("X");
+//        } else {
+//            mvprintw("%d", (hardnesspair(p) / 85) + 1);
+//        }
+//      }
+//    }
+//    mvaddch('\n');
+//  }
+//}
 
-  mvaddch('\n');
-  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
-    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
-      if (p[dim_x] ==  d->pc.position[dim_x] &&
-          p[dim_y] ==  d->pc.position[dim_y]) {
-        mvaddch('@');
-      } else {
-        if (hardnesspair(p) == 255) {
-            mvprintw("X");
-        } else {
-            mvprintw("%d", (hardnesspair(p) / 85) + 1);
-        }
-      }
-    }
-    mvaddch('\n');
-  }
-}
+//void render_distance_map(dungeon_t *d)
+//{
+//  pair_t p;
+//
+//  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
+//    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
+//      if (p[dim_x] ==  d->pc.position[dim_x] &&
+//          p[dim_y] ==  d->pc.position[dim_y]) {
+//        mvaddch('@');
+//      } else {
+//        switch (mappair(p)) {
+//        case ter_wall:
+//        case ter_wall_immutable:
+//          mvaddch(' ');
+//          break;
+//        case ter_floor:
+//        case ter_floor_room:
+//        case ter_floor_hall:
+//        case ter_stairs:
+//        case ter_stairs_up:
+//        case ter_stairs_down:
+//          /* Placing X for infinity */
+//          if (d->pc_distance[p[dim_y]][p[dim_x]] == UCHAR_MAX) {
+//            mvaddch('X');
+//          } else {
+//            mvaddch('0' + d->pc_distance[p[dim_y]][p[dim_x]] % 10);
+//          }
+//          break;
+//        case ter_debug:
+//          fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
+//          mvaddch('*');
+//          break;
+//        }
+//      }
+//    }
+//    mvaddch('\n');
+//  }
+//}
 
-void render_distance_map(dungeon_t *d)
-{
-  pair_t p;
-
-  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
-    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
-      if (p[dim_x] ==  d->pc.position[dim_x] &&
-          p[dim_y] ==  d->pc.position[dim_y]) {
-        mvaddch('@');
-      } else {
-        switch (mappair(p)) {
-        case ter_wall:
-        case ter_wall_immutable:
-          mvaddch(' ');
-          break;
-        case ter_floor:
-        case ter_floor_room:
-        case ter_floor_hall:
-        case ter_stairs:
-        case ter_stairs_up:
-        case ter_stairs_down:
-          /* Placing X for infinity */
-          if (d->pc_distance[p[dim_y]][p[dim_x]] == UCHAR_MAX) {
-            mvaddch('X');
-          } else {
-            mvaddch('0' + d->pc_distance[p[dim_y]][p[dim_x]] % 10);
-          }
-          break;
-        case ter_debug:
-          fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
-          mvaddch('*');
-          break;
-        }
-      }
-    }
-    mvaddch('\n');
-  }
-}
-
-void render_tunnel_distance_map(dungeon_t *d)
-{
-  pair_t p;
-
-  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
-    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
-      if (p[dim_x] ==  d->pc.position[dim_x] &&
-          p[dim_y] ==  d->pc.position[dim_y]) {
-        mvaddch('@');
-      } else {
-        switch (mappair(p)) {
-        case ter_wall_immutable:
-          mvaddch(' ');
-          break;
-        case ter_wall:
-        case ter_floor:
-        case ter_floor_room:
-        case ter_floor_hall:
-        case ter_stairs:
-        case ter_stairs_up:
-        case ter_stairs_down:
-          /* Placing X for infinity */
-          if (d->pc_tunnel[p[dim_y]][p[dim_x]] == UCHAR_MAX) {
-            mvaddch('X');
-          } else {
-            mvaddch('0' + d->pc_tunnel[p[dim_y]][p[dim_x]] % 10);
-          }
-          break;
-        case ter_debug:
-          fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
-          mvaddch('*');
-          break;
-        }
-      }
-    }
-    mvaddch('\n');
-  }
-}
+//void render_tunnel_distance_map(dungeon_t *d)
+//{
+//  pair_t p;
+//
+//  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
+//    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
+//      if (p[dim_x] ==  d->pc.position[dim_x] &&
+//          p[dim_y] ==  d->pc.position[dim_y]) {
+//        mvaddch('@');
+//      } else {
+//        switch (mappair(p)) {
+//        case ter_wall_immutable:
+//          mvaddch(' ');
+//          break;
+//        case ter_wall:
+//        case ter_floor:
+//        case ter_floor_room:
+//        case ter_floor_hall:
+//        case ter_stairs:
+//        case ter_stairs_up:
+//        case ter_stairs_down:
+//          /* Placing X for infinity */
+//          if (d->pc_tunnel[p[dim_y]][p[dim_x]] == UCHAR_MAX) {
+//            mvaddch('X');
+//          } else {
+//            mvaddch('0' + d->pc_tunnel[p[dim_y]][p[dim_x]] % 10);
+//          }
+//          break;
+//        case ter_debug:
+//          fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
+//          mvaddch('*');
+//          break;
+//        }
+//      }
+//    }
+//    mvaddch('\n');
+//  }
+//}
