@@ -17,6 +17,7 @@
 #include "utils.h"
 #include "event.h"
 #include "move.h"
+#include "pc.h"
 
 #define DUMP_HARDNESS_IMAGES 0
 
@@ -716,7 +717,7 @@ int movepc(dungeon_t *d, int move){
             }
         }
 
-
+    return 1;
     }
     else if(move == 8){
         if( cury > 1){

@@ -111,7 +111,9 @@ void do_moves(dungeon_t *d)
 //      hardnesspair(next) = 0;
 //    }
 //    move_character(d, c, next);
-      int no_op, mon_list=0;
+
+      int no_op;
+      int mon_list=0;
       int32_t key;
 
       //while(!dead){
@@ -119,46 +121,46 @@ void do_moves(dungeon_t *d)
           switch(key){
               case '7':
               case 'y':
-                  no_op = movepc(&d, 7);
+                  no_op = movepc(d, 7);
                   break;
               case '8':
               case 'k':
-                  no_op = movepc(&d, 8);
+                  no_op = movepc(d, 8);
                   break;
               case '9':
               case 'u':
-                  no_op = movepc(&d, 9);
+                  no_op = movepc(d, 9);
                   break;
               case '6':
               case 'l':
-                  no_op = movepc(&d, 6);
+                  no_op = movepc(d, 6);
                   break;
               case '3':
               case 'n':
-                  no_op = movepc(&d, 3);
+                  no_op = movepc(d, 3);
                   break;
               case '2':
               case 'j':
-                  no_op = movepc(&d, 2);
+                  no_op = movepc(d, 2);
                   break;
               case '1':
               case 'b':
-                  no_op = movepc(&d, 1);
+                  no_op = movepc(d, 1);
                   break;
               case '4':
               case 'h':
-                  no_op = movepc(&d, 4);
+                  no_op = movepc(d, 4);
                   break;
               case '>':
-                  no_op = movepc(&d, 10);
+                  no_op = movepc(d, 10);
                   break;
               case '<':
-                  no_op = movepc(&d, 11);
+                  no_op = movepc(d, 11);
                   break;
               case ' ':
               case '5':
               case '.':
-                  no_op = movepc(&d, 5);
+                  no_op = movepc(d, 5);
                   break;
               case 'm':
                   mon_list = 1;
@@ -177,7 +179,7 @@ void do_moves(dungeon_t *d)
                   break;
           }
           if(mon_list == 0){
-              render_dungeon(&d);
+              render_dungeon(d);
               //no_op = 1;
           }
 //          else{
