@@ -3,11 +3,13 @@
 
 //# include "heap.h"
 //# include "dims.h"
-//# include "character.h"
+# include "character.h"
 #include "heap.h"
 #include "dungeon.h"
-#include "utils.h"
-#include "event.h"
+//#include "utils.h"
+//#include "event.h"
+#include "pc.h"
+#include "npc.h"
 #include "move.h"
 
 #define DUNGEON_X              80

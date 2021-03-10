@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <ncurses.h>
 
 #include "dungeon.h"
 #include "heap.h"
@@ -13,6 +14,7 @@
 #include "utils.h"
 #include "path.h"
 #include "event.h"
+
 
 void do_combat(dungeon_t *d, character_t *atk, character_t *def)
 {
@@ -165,23 +167,25 @@ void do_moves(dungeon_t *d)
               case 'm':
                   mon_list = 1;
                   break;
-              case KEY_DOWN:
-                  break;
-              case KEY_UP:
-                  break;
-              case KEY_EXIT:
-                  mon_list = 0;
-                  break;
+		  // case KEY_DOWN:
+		  //      break;
+		  //  case KEY_UP:
+		  //     break;
+		  //case KEY_EXIT:
+		  //   mon_list = 0;
+		  //  break;
               case 'Q':
                   break;
-              case default:
-                  mvprintw("key: %d", key)
+              default:
+		// mvprintw("key: %d", key)
                   break;
           }
           if(mon_list == 0){
               render_dungeon(d);
               //no_op = 1;
           }
+	  if(no_op == 1){
+	  }
 //          else{
 //              render_mon_list(&d);
 //          }
