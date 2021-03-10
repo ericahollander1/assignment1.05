@@ -16,6 +16,7 @@
 #include "dungeon.h"
 #include "utils.h"
 #include "event.h"
+#include "move.h"
 
 #define DUMP_HARDNESS_IMAGES 0
 
@@ -786,7 +787,7 @@ void render_dungeon(dungeon_t *d)
   for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
     for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
       if (charpair(p)) {
-        mvaddch(charpair(p)->symbol);
+        mvaddch(p[dim_y], p[dim_x], charpair(p)->symbol);
       } else {
         switch (mappair(p)) {
         case ter_wall:
@@ -815,7 +816,7 @@ void render_dungeon(dungeon_t *d)
         }
       }
     }
-      mvaddch('\n');
+    //  mvaddch('\n');
   }
   //mvaddch('\n');
   //mvaddch('\n');
