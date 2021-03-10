@@ -632,7 +632,7 @@ int movepc(dungeon_t *d, int move){
            if(d->map[cury+1][curx-1] == ter_stairs_down || d->map[cury+1][curx-1] == ter_stairs_up || d->map[cury+1][curx-1] == ter_floor_hall || d->map[cury+1][curx-1] == ter_floor_room) {
                nextPair[dim_x] = curx - 1;
                nextPair[dim_y] = cury + 1;
-               move_character(d, d->pc, nextPair);
+               move_character(d, &(d->pc), nextPair);
                return 0;
            }
            else{
@@ -646,7 +646,7 @@ int movepc(dungeon_t *d, int move){
         if(cury < 20){
             if(d->map[cury+1][curx] == ter_stairs_down || d->map[cury+1][curx] == ter_stairs_up || d->map[cury+1][curx] == ter_floor_hall || d->map[cury+1][curx] == ter_floor_room) {
                 nextPair[dim_y] = cury + 1;
-                move_character(d, d->pc, nextPair);
+                move_character(d, &(d->pc), nextPair);
                 return 0;
             }
             else{
@@ -661,7 +661,7 @@ int movepc(dungeon_t *d, int move){
             if(d->map[cury+1][curx+1] == ter_stairs_down || d->map[cury+1][curx+1] == ter_stairs_up || d->map[cury+1][curx+1] == ter_floor_hall || d->map[cury+1][curx+1] == ter_floor_room) {
                 nextPair[dim_x] = curx + 1;
                 nextPair[dim_y] = cury + 1;
-                move_character(d, d->pc, nextPair);
+                move_character(d, &(d->pc), nextPair);
                 return 0;
             }
             else{
@@ -675,7 +675,7 @@ int movepc(dungeon_t *d, int move){
         if(curx > 1){
             if(d->map[cury][curx-1] == ter_stairs_down || d->map[cury][curx-1] == ter_stairs_up || d->map[cury][curx-1] == ter_floor_hall || d->map[cury][curx-1] == ter_floor_room) {
                 nextPair[dim_x] = curx - 1;
-                move_character(d, d->pc, nextPair);
+                move_character(d, &(d->pc), nextPair);
                 return 0;
             }
             else{
@@ -686,14 +686,14 @@ int movepc(dungeon_t *d, int move){
 
     }
     else if(move == 5){
-                move_character(d, d->pc, nextPair);
+                move_character(d, &(d->pc), nextPair);
                 return 0;
     }
     else if(move == 6){
         if(curx < 79){
             if(d->map[cury][curx+1] == ter_stairs_down || d->map[cury][curx+1] == ter_stairs_up || d->map[cury][curx+1] == ter_floor_hall || d->map[cury][curx+1] == ter_floor_room) {
                 nextPair[dim_x] = curx + 1;
-                move_character(d, d->pc, nextPair);
+                move_character(d, &(d->pc), nextPair);
                 return 0;
             }
             else{
@@ -708,7 +708,7 @@ int movepc(dungeon_t *d, int move){
             if(d->map[cury-1][curx-1] == ter_stairs_down || d->map[cury-1][curx-1] == ter_stairs_up || d->map[cury-1][curx-1] == ter_floor_hall || d->map[cury-1][curx-1] == ter_floor_room) {
                 nextPair[dim_x] = curx - 1;
                 nextPair[dim_y] = cury - 1;
-                move_character(d, d->pc, nextPair);
+                move_character(d, &(d->pc), nextPair);
                 return 0;
             }
             else{
@@ -722,7 +722,7 @@ int movepc(dungeon_t *d, int move){
         if( cury > 1){
             if(d->map[cury-1][curx] == ter_stairs_down || d->map[cury-1][curx] == ter_stairs_up || d->map[cury-1][curx] == ter_floor_hall || d->map[cury-1][curx] == ter_floor_room) {
                 nextPair[dim_y] = cury - 1;
-                move_character(d, d->pc, nextPair);
+                move_character(d, &(d->pc), nextPair);
                 return 0;
             }
             else{
@@ -737,7 +737,7 @@ int movepc(dungeon_t *d, int move){
             if(d->map[cury-1][curx+1] == ter_stairs_down || d->map[cury-1][curx+1] == ter_stairs_up || d->map[cury+1][curx-1] == ter_floor_hall || d->map[cury+1][curx-1] == ter_floor_room) {
                 nextPair[dim_x] = curx + 1;
                 nextPair[dim_y] = cury - 1;
-                move_character(d, d->pc, nextPair);
+                move_character(d, &(d->pc), nextPair);
                 return 0;
             }
             else{
