@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ncurses.h>
 
 #include "dungeon.h"
 #include "pc.h"
@@ -75,7 +76,7 @@ void usage(char *name)
           name);
 
   exit(-1);
-//}
+}
 //void gameloop(){
 //   int dead , no_op, mon_list=0;
 //    int32_t key;
@@ -155,7 +156,13 @@ void usage(char *name)
 //    }
 //
 //}
-
+void io_init_terminal(void){
+  initscr();
+  raw();
+  noecho();
+  curs_set(0);
+  keypad(stdscr, TRUE);
+}
 int main(int argc, char *argv[])
 {
   dungeon_t d;
@@ -289,12 +296,12 @@ int main(int argc, char *argv[])
   }
 
   if (!do_load && !do_image) {
-      mvprintw("Seed is %ld.\n", seed);
+      printf("Seed is %ld.\n", seed);
   } else {
-      mvprintw("Seed is %ld.  Dungeon loaded from file.\n", seed);
+      printf("Seed is %ld.  Dungeon loaded from file.\n", seed);
   }
   srand(seed);
-
+  io_init_terminal();
   init_dungeon(&d);
 
   if (do_load) {
@@ -343,8 +350,8 @@ int main(int argc, char *argv[])
     }
   }
 
-    mvprintw("%s", pc_is_alive(&d) ? victory : tombstone);
-    mvprintw("You defended your life in the face of %u deadly beasts.\n"
+    printf("%s", pc_is_alive(&d) ? victory : tombstone);
+    printf("You defended your life in the face of %u deadly beasts.\n"
          "You avenged the cruel and untimely murders of %u "
          "peaceful dungeon residents.\n",
          d.pc.kills[kill_direct], d.pc.kills[kill_avenged]);
@@ -352,6 +359,6 @@ int main(int argc, char *argv[])
   pc_delete(d.pc.pc);
 
   delete_dungeon(&d);
-
+  endwin();
   return 0;
 }

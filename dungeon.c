@@ -9,7 +9,7 @@
 #include <sys/time.h>
 #include <assert.h>
 #include <errno.h>
-#inlcude <ncurses.h>
+#include <ncurses.h>
 
 
 #include "heap.h"
@@ -782,7 +782,7 @@ void render_dungeon(dungeon_t *d)
 {
   pair_t p;
 
-  mvaddch('\n');
+  mvprintw("\n");
   for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
     for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
       if (charpair(p)) {
@@ -791,24 +791,24 @@ void render_dungeon(dungeon_t *d)
         switch (mappair(p)) {
         case ter_wall:
         case ter_wall_immutable:
-            mvaddch(' ');
+	    mvaddch(p[dim_y], p[dim_x],' ');
           break;
         case ter_floor:
         case ter_floor_room:
-            mvaddch('.');
+	  mvaddch(p[dim_y], p[dim_x],'.');
           break;
         case ter_floor_hall:
-            mvaddch('#');
+	  mvaddch(p[dim_y], p[dim_x],'#');
           break;
         case ter_debug:
-            mvaddch('*');
+	  mvaddch(p[dim_y], p[dim_x],'*');
           fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
           break;
         case ter_stairs_up:
-            mvaddch('<');
+	  mvaddch(p[dim_y], p[dim_x],'<');
           break;
         case ter_stairs_down:
-            mvaddch('>');
+	  mvaddch(p[dim_y], p[dim_x], '>');
           break;
         default:
           break;
