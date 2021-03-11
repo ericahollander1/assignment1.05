@@ -34,7 +34,8 @@ void write_monsters(dungeon_t *d, pair_t *list_monsters_pos, int min_value, int 
     int i, j;
     int line = 4;
     int x_dif, y_dif;
-    char* xdir = "East", ydir = "South";
+    char* xdir = "West";
+    char* ydir = "North";
     for(j=28; j<50; j++){
         for(i=2; i<27; i++){
             mvprintw(i, j, " ");
@@ -53,10 +54,10 @@ void write_monsters(dungeon_t *d, pair_t *list_monsters_pos, int min_value, int 
 
         y_dif = d->pc.position[dim_y]-list_monsters_pos[i][dim_y];
         if(x_dif < 0){
-            xdir = "West";
+            xdir = "East";
         }
         if(y_dif < 0){
-            ydir = "North";
+            ydir = "South";
         }
         mvprintw(line, 30, "%c: %2d %s %2d %s", charpair(list_monsters_pos[i])->symbol, abs(x_dif), xdir, abs(y_dif), ydir);//direction_x(x_dif), direction_y(y_dif)
     line++;
@@ -72,7 +73,7 @@ void display_monsters(dungeon_t *d, pair_t dir){
     int max_value;
     int min_value = 0;
     if(d->num_monsters < 10){
-        max_value = num_monsters;
+        max_value = d->num_monsters;
     }
     else{
         max_value = 10;
@@ -105,7 +106,7 @@ void display_monsters(dungeon_t *d, pair_t dir){
                 write_monsters(d, list_monsters_pos, min_value, max_value);
                 break;
             case KEY_DOWN:
-                if(max_value != d->num_monsters-1){
+                if(!(max_value >= d->num_monsters)){
                     min_value++;
                     max_value++;
                 }
