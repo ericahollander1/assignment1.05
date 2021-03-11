@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <ncurses.h>
 
 #include "string.h"
 
@@ -38,7 +39,7 @@ void write_monsters(dungeon_t *d, pair_t *list_monsters_pos, int min_value, int 
             mvprintw(i, j, " ");
         }
     }
-    for(i=29; i<50; i++);{
+    for(i=29; i<50; i++){
         mvprintw(2, i, "-");
         mvprintw(15, i, "-");
     }
