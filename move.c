@@ -18,221 +18,147 @@
 
 void do_combat(dungeon_t *d, character_t *atk, character_t *def)
 {
-  if (def->alive) {
-    def->alive = 0;
-    if (def != &d->pc) {
-      d->num_monsters--;
+    if (def->alive) {
+        def->alive = 0;
+        if (def != &d->pc) {
+            d->num_monsters--;
+        }
+        atk->kills[kill_direct]++;
+        atk->kills[kill_avenged] += (def->kills[kill_direct] +
+                                     def->kills[kill_avenged]);
     }
-    atk->kills[kill_direct]++;
-    atk->kills[kill_avenged] += (def->kills[kill_direct] +
-                                  def->kills[kill_avenged]);
-  }
 }
 
 void move_character(dungeon_t *d, character_t *c, pair_t next)
 {
-  if (charpair(next) &&
-      ((next[dim_y] != c->position[dim_y]) ||
-       (next[dim_x] != c->position[dim_x]))) {
-    do_combat(d, c, charpair(next));
-  } else {
-    /* No character in new position. */
+    if (charpair(next) &&
+        ((next[dim_y] != c->position[dim_y]) ||
+         (next[dim_x] != c->position[dim_x]))) {
+        do_combat(d, c, charpair(next));
+    } else {
+        /* No character in new position. */
 
-    d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
-    c->position[dim_y] = next[dim_y];
-    c->position[dim_x] = next[dim_x];
-    d->character[c->position[dim_y]][c->position[dim_x]] = c;
-  }
+        d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
+        c->position[dim_y] = next[dim_y];
+        c->position[dim_x] = next[dim_x];
+        d->character[c->position[dim_y]][c->position[dim_x]] = c;
+    }
 }
 
 void do_moves(dungeon_t *d)
 {
-  pair_t next;
-  character_t *c;
-  event_t *e;
+    pair_t next;
+    character_t *c;
+    event_t *e;
 
-  /* Remove the PC when it is PC turn.  Replace on next call.  This allows *
-   * use to completely uninit the heap when generating a new level without *
-   * worrying about deleting the PC.                                       */
+    /* Remove the PC when it is PC turn.  Replace on next call.  This allows *
+     * use to completely uninit the heap when generating a new level without *
+     * worrying about deleting the PC.                                       */
 
-  if (pc_is_alive(d)) {
-    /* The PC always goes first one a tie, so we don't use new_event().  *
-     * We generate one manually so that we can set the PC sequence       *
-     * number to zero.                                                   */
-    e = malloc(sizeof (*e));
-    e->type = event_character_turn;
-    /* Hack: New dungeons are marked.  Unmark and ensure PC goes at d->time, *
-     * otherwise, monsters get a turn before the PC.                         */
-    if (d->is_new) {
-      d->is_new = 0;
-      e->time = d->time;
-    } else {
-      e->time = d->time + (1000 / d->pc.speed);
+    if (pc_is_alive(d)) {
+        /* The PC always goes first one a tie, so we don't use new_event().  *
+         * We generate one manually so that we can set the PC sequence       *
+         * number to zero.                                                   */
+        e = malloc(sizeof (*e));
+        e->type = event_character_turn;
+        /* Hack: New dungeons are marked.  Unmark and ensure PC goes at d->time, *
+         * otherwise, monsters get a turn before the PC.                         */
+        if (d->is_new) {
+            d->is_new = 0;
+            e->time = d->time;
+        } else {
+            e->time = d->time + (1000 / d->pc.speed);
+        }
+        e->sequence = 0;
+        e->c = &d->pc;
+        heap_insert(&d->events, e);
     }
-    e->sequence = 0;
-    e->c = &d->pc;
-    heap_insert(&d->events, e);
-  }
 
-  while (pc_is_alive(d) &&
-         (e = heap_remove_min(&d->events)) &&
-         ((e->type != event_character_turn) || (e->c != &d->pc))) {
-    d->time = e->time;
-    if (e->type == event_character_turn) {
-      c = e->c;
+    while (pc_is_alive(d) &&
+           (e = heap_remove_min(&d->events)) &&
+           ((e->type != event_character_turn) || (e->c != &d->pc))) {
+        d->time = e->time;
+        if (e->type == event_character_turn) {
+            c = e->c;
+        }
+        if (!c->alive) {
+            if (d->character[c->position[dim_y]][c->position[dim_x]] == c) {
+                d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
+            }
+            if (c != &d->pc) {
+                event_delete(e);
+            }
+            continue;
+        }
+
+        npc_next_pos(d, c, next);
+        move_character(d, c, next);
+
+        heap_insert(&d->events, update_event(d, e, 1000 / c->speed));
     }
-    if (!c->alive) {
-      if (d->character[c->position[dim_y]][c->position[dim_x]] == c) {
-        d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
-      }
-      if (c != &d->pc) {
+
+    if (pc_is_alive(d) && e->c == &d->pc) {
+        c = e->c;
+        d->time = e->time;
+        /* Kind of kludgey, but because the PC is never in the queue when   *
+         * we are outside of this function, the PC event has to get deleted *
+         * and recreated every time we leave and re-enter this function.    */
+        e->c = NULL;
         event_delete(e);
-      }
-      continue;
-    }
-
-    npc_next_pos(d, c, next);
-    move_character(d, c, next);
-
-    heap_insert(&d->events, update_event(d, e, 1000 / c->speed));
-  }
-
-  if (pc_is_alive(d) && e->c == &d->pc) {
-    c = e->c;
-    d->time = e->time;
-    /* Kind of kludgey, but because the PC is never in the queue when   *
-     * we are outside of this function, the PC event has to get deleted *
-     * and recreated every time we leave and re-enter this function.    */
-    e->c = NULL;
-    event_delete(e);
-//    pc_next_pos(d, next);
-//    next[dim_x] += c->position[dim_x];
-//    next[dim_y] += c->position[dim_y];
+    pc_next_pos(d, next);
+    next[dim_x] += c->position[dim_x];
+    next[dim_y] += c->position[dim_y];
 //    if (mappair(next) <= ter_floor) {
 //      mappair(next) = ter_floor_hall;
 //      hardnesspair(next) = 0;
 //    }
-//    move_character(d, c, next);
+    if(mappair(next)==ter_floor_room || mappair(next)==ter_floor_hall || mappair(next) >=ter_stairs){
+      move_character(d, c, next);
+    }
 
-      int no_op;
-      int mon_list=0;
-      int32_t key;
-
-      //while(!dead){
-          key = getch();
-          switch(key){
-              case '7':
-              case 'y':
-                  no_op = movepc(d, 7);
-                  break;
-              case '8':
-              case 'k':
-                  no_op = movepc(d, 8);
-                  break;
-              case '9':
-              case 'u':
-                  no_op = movepc(d, 9);
-                  break;
-              case '6':
-              case 'l':
-                  no_op = movepc(d, 6);
-                  break;
-              case '3':
-              case 'n':
-                  no_op = movepc(d, 3);
-                  break;
-              case '2':
-              case 'j':
-                  no_op = movepc(d, 2);
-                  break;
-              case '1':
-              case 'b':
-                  no_op = movepc(d, 1);
-                  break;
-              case '4':
-              case 'h':
-                  no_op = movepc(d, 4);
-                  break;
-              case '>':
-                  no_op = movepc(d, 10);
-                  break;
-              case '<':
-                  no_op = movepc(d, 11);
-                  break;
-              case ' ':
-              case '5':
-              case '.':
-                  no_op = movepc(d, 5);
-                  break;
-              case 'm':
-                  mon_list = 1;
-                  break;
-		  // case KEY_DOWN:
-		  //      break;
-		  //  case KEY_UP:
-		  //     break;
-		  //case KEY_EXIT:
-		  //   mon_list = 0;
-		  //  break;
-              case 'Q':
-                  break;
-              default:
-		// mvprintw("key: %d", key)
-                  break;
-          }
-          if(mon_list == 0){
-              render_dungeon(d);
-              //no_op = 1;
-          }
-	  if(no_op == 1){
-	  }
-//          else{
-//              render_mon_list(&d);
-//          }
-     // }
-    dijkstra(d);
-    dijkstra_tunnel(d);
-  }
+        dijkstra(d);
+        dijkstra_tunnel(d);
+    }
 }
 
 void dir_nearest_wall(dungeon_t *d, character_t *c, pair_t dir)
 {
-  dir[dim_x] = dir[dim_y] = 0;
+    dir[dim_x] = dir[dim_y] = 0;
 
-  if (c->position[dim_x] != 1 && c->position[dim_x] != DUNGEON_X - 2) {
-    dir[dim_x] = (c->position[dim_x] > DUNGEON_X - c->position[dim_x] ? 1 : -1);
-  }
-  if (c->position[dim_y] != 1 && c->position[dim_y] != DUNGEON_Y - 2) {
-    dir[dim_y] = (c->position[dim_y] > DUNGEON_Y - c->position[dim_y] ? 1 : -1);
-  }
+    if (c->position[dim_x] != 1 && c->position[dim_x] != DUNGEON_X - 2) {
+        dir[dim_x] = (c->position[dim_x] > DUNGEON_X - c->position[dim_x] ? 1 : -1);
+    }
+    if (c->position[dim_y] != 1 && c->position[dim_y] != DUNGEON_Y - 2) {
+        dir[dim_y] = (c->position[dim_y] > DUNGEON_Y - c->position[dim_y] ? 1 : -1);
+    }
 }
 
 uint32_t against_wall(dungeon_t *d, character_t *c)
 {
-  return ((mapxy(c->position[dim_x] - 1,
-                 c->position[dim_y]    ) == ter_wall_immutable) ||
-          (mapxy(c->position[dim_x] + 1,
-                 c->position[dim_y]    ) == ter_wall_immutable) ||
-          (mapxy(c->position[dim_x]    ,
-                 c->position[dim_y] - 1) == ter_wall_immutable) ||
-          (mapxy(c->position[dim_x]    ,
-                 c->position[dim_y] + 1) == ter_wall_immutable));
+    return ((mapxy(c->position[dim_x] - 1,
+                   c->position[dim_y]    ) == ter_wall_immutable) ||
+            (mapxy(c->position[dim_x] + 1,
+                   c->position[dim_y]    ) == ter_wall_immutable) ||
+            (mapxy(c->position[dim_x]    ,
+                   c->position[dim_y] - 1) == ter_wall_immutable) ||
+            (mapxy(c->position[dim_x]    ,
+                   c->position[dim_y] + 1) == ter_wall_immutable));
 }
 
 uint32_t in_corner(dungeon_t *d, character_t *c)
 {
-  uint32_t num_immutable;
+    uint32_t num_immutable;
 
-  num_immutable = 0;
+    num_immutable = 0;
 
-  num_immutable += (mapxy(c->position[dim_x] - 1,
-                          c->position[dim_y]    ) == ter_wall_immutable);
-  num_immutable += (mapxy(c->position[dim_x] + 1,
-                          c->position[dim_y]    ) == ter_wall_immutable);
-  num_immutable += (mapxy(c->position[dim_x]    ,
-                          c->position[dim_y] - 1) == ter_wall_immutable);
-  num_immutable += (mapxy(c->position[dim_x]    ,
-                          c->position[dim_y] + 1) == ter_wall_immutable);
+    num_immutable += (mapxy(c->position[dim_x] - 1,
+                            c->position[dim_y]    ) == ter_wall_immutable);
+    num_immutable += (mapxy(c->position[dim_x] + 1,
+                            c->position[dim_y]    ) == ter_wall_immutable);
+    num_immutable += (mapxy(c->position[dim_x]    ,
+                            c->position[dim_y] - 1) == ter_wall_immutable);
+    num_immutable += (mapxy(c->position[dim_x]    ,
+                            c->position[dim_y] + 1) == ter_wall_immutable);
 
-  return num_immutable > 1;
+    return num_immutable > 1;
 }
