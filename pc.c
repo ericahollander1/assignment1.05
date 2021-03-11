@@ -33,24 +33,24 @@ void write_monsters(dungeon_t *d, pair_t *list_monsters_pos, int min_value, int 
     int i, j;
     int line = 4;
     int x_dif, y_dif;
-    for(j=28;j<50;j++){
-        for(i=2;i<27;i++){
-            mvprint(i, j, " ");
+    for(j=28; j<50; j++){
+        for(i=2; i<27; i++){
+            mvprintw(i, j, " ");
         }
     }
-    for(i=29; i<50;i++);{
+    for(i=29; i<50; i++);{
         mvprintw(2, i, "-");
-        mvprintw(15, i), "-");
+        mvprintw(15, i, "-");
     }
-    for(i=2;i<16;i++){
+    for(i=2; i<16; i++){
         mvprintw(i, 28, "|");
         mvprintw(i, 50, "|");
     }
-    for(i=min_value;i<max_value;i++){
+    for(i=min_value; i<max_value; i++){
         x_dif = d->pc.position[dim_x]-list_monsters_pos[i][dim_x];
 
         y_dif = d->pc.position[dim_y]-list_monsters_pos[i][dim_y];
-        mvprintw(line, 30, "%c: %2d %s %2d%s", charpair(list_monsters_pos[i])->symbol, abs(x_dir), direction_x(x_dif), abs(y_dif), direction_y(y_dif))
+        mvprintw(line, 30, "%c: %2d %s %2d %s", charpair(list_monsters_pos[i])->symbol, abs(x_dif), "monsterx", abs(y_dif), "monstery";//direction_x(x_dif), direction_y(y_dif)
     line++;
     }
     refresh();
@@ -128,10 +128,10 @@ void config_pc(dungeon_t *d)
 
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 {
-    int no_op;
-    int mon_list=0;
+//    int no_op;
+//    int mon_list=0;
     char key;
-    dir[dim_y]=dir[dim_x]=0
+    dir[dim_y]=dir[dim_x]=0;
 
     //while(!dead){
     key = getch();
@@ -173,7 +173,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
             dir[dim_x]--;
             break;
         case '>':
-            if(onStairs(d, pcx, pcy)==1){
+            if(d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_down){
                 delete_dungeon(d);
                 init_dungeon(d);
                 gen_dungeon(d);
@@ -184,7 +184,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
             dir[dim_y] = dir[dim_x] = 0;
             break;
         case '<':
-            if(onStairs(d, pcx, pcy)==1){
+            if(d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_up){
                 delete_dungeon(d);
                 init_dungeon(d);
                 gen_dungeon(d);
