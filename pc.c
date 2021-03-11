@@ -34,6 +34,7 @@ void write_monsters(dungeon_t *d, pair_t *list_monsters_pos, int min_value, int 
     int i, j;
     int line = 4;
     int x_dif, y_dif;
+    char* xdir = "East", ydir = "South";
     for(j=28; j<50; j++){
         for(i=2; i<27; i++){
             mvprintw(i, j, " ");
@@ -47,11 +48,17 @@ void write_monsters(dungeon_t *d, pair_t *list_monsters_pos, int min_value, int 
         mvprintw(i, 28, "|");
         mvprintw(i, 50, "|");
     }
-    for(i=min_value; i<max_value; i++){
+    for(i=min_value; i < max_value; i++){
         x_dif = d->pc.position[dim_x]-list_monsters_pos[i][dim_x];
 
         y_dif = d->pc.position[dim_y]-list_monsters_pos[i][dim_y];
-        mvprintw(line, 30, "%c: %2d %s %2d %s", charpair(list_monsters_pos[i])->symbol, abs(x_dif), "monsterx", abs(y_dif), "monstery";//direction_x(x_dif), direction_y(y_dif)
+        if(x_dif < 0){
+            xdir = "West";
+        }
+        if(y_dif < 0){
+            ydir = "North";
+        }
+        mvprintw(line, 30, "%c: %2d %s %2d %s", charpair(list_monsters_pos[i])->symbol, abs(x_dif), xdir, abs(y_dif), ydir);//direction_x(x_dif), direction_y(y_dif)
     line++;
     }
     refresh();
@@ -62,9 +69,14 @@ void display_monsters(dungeon_t *d, pair_t dir){
     pair_t p;
     pair_t list_monsters_pos[d->num_monsters];
     int current = 0;
-    int max_value= 10;
+    int max_value;
     int min_value = 0;
-
+    if(d->num_monsters < 10){
+        max_value = num_monsters;
+    }
+    else{
+        max_value = 10;
+    }
     for(p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++){
         for(p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++){
             if(charpair(p)){
@@ -82,6 +94,7 @@ void display_monsters(dungeon_t *d, pair_t dir){
         move = getch();
         switch(move){
             case 27:
+            case 'z':
                 done = 1;
                 break;
             case KEY_UP:
@@ -92,7 +105,7 @@ void display_monsters(dungeon_t *d, pair_t dir){
                 write_monsters(d, list_monsters_pos, min_value, max_value);
                 break;
             case KEY_DOWN:
-                if(min_value != d->num_monsters-1){
+                if(max_value != d->num_monsters-1){
                     min_value++;
                     max_value++;
                 }
@@ -153,7 +166,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
             break;
         case '6':
         case 'l':
-            dir[dim_y]++;
+            dir[dim_x]++;
             break;
         case '3':
         case 'n':
